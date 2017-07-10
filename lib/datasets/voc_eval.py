@@ -28,6 +28,24 @@ def parse_rec(filename):
 
     return objects
 
+def read_rec(filename):
+    """ read a text file """
+    objects = []
+    fashion_labels = open(filename, 'r').readlines()
+    for i, obj in enumerate(fashion_labels):
+	xmin = int(float(obj.split(' ')[0]))
+	ymin = int(float(obj.split(' ')[1]))
+	xlen = int(float(obj.split(' ')[2]))
+	ylen = int(float(obj.split(' ')[3]))
+	obj_struct = {}
+	obj_struct['id'] = int(float(obj.split(' ')[4]))
+	xmax = xmin + xlen
+	ymax = ymin + ylen
+	obj_struct['bbox'] = [xmin, ymin, xmax, ymax]
+	objects.append(obj_struct)
+
+    return objects
+
 def voc_ap(rec, prec, use_07_metric=False):
     """ ap = voc_ap(rec, prec, [use_07_metric])
     Compute VOC AP given precision and recall.
@@ -64,7 +82,7 @@ def voc_ap(rec, prec, use_07_metric=False):
 def voc_eval(detpath,
              annopath,
              imagesetfile,
-             classname,
+             class_id,
              cachedir,
              ovthresh=0.5,
              use_07_metric=False):
@@ -82,7 +100,7 @@ def voc_eval(detpath,
     annopath: Path to annotations
         annopath.format(imagename) should be the xml annotations file.
     imagesetfile: Text file containing the list of images, one image per line.
-    classname: Category name (duh)
+    class_id: Category id (duh)
     cachedir: Directory for caching the annotations
     [ovthresh]: Overlap threshold (default = 0.5)
     [use_07_metric]: Whether to use VOC07's 11 point AP computation
@@ -106,7 +124,7 @@ def voc_eval(detpath,
         # load annots
         recs = {}
         for i, imagename in enumerate(imagenames):
-            recs[imagename] = parse_rec(annopath.format(imagename))
+            recs[imagename] = read_rec(annopath.format(imagename))
             if i % 100 == 0:
                 print 'Reading annotation for {:d}/{:d}'.format(
                     i + 1, len(imagenames))
@@ -123,17 +141,17 @@ def voc_eval(detpath,
     class_recs = {}
     npos = 0
     for imagename in imagenames:
-        R = [obj for obj in recs[imagename] if obj['name'] == classname]
+        R = [obj for obj in recs[imagename] if obj['id'] == class_id]
         bbox = np.array([x['bbox'] for x in R])
-        difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
+        # difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
         det = [False] * len(R)
-        npos = npos + sum(~difficult)
+        # npos = npos + sum(~difficult)
+	npos += len(R)
         class_recs[imagename] = {'bbox': bbox,
-                                 'difficult': difficult,
+                                 # 'difficult': difficult,
                                  'det': det}
-
     # read dets
-    detfile = detpath.format(classname)
+    detfile = detpath.format(class_id)
     with open(detfile, 'r') as f:
         lines = f.readlines()
 
@@ -179,12 +197,12 @@ def voc_eval(detpath,
             jmax = np.argmax(overlaps)
 
         if ovmax > ovthresh:
-            if not R['difficult'][jmax]:
-                if not R['det'][jmax]:
-                    tp[d] = 1.
-                    R['det'][jmax] = 1
-                else:
-                    fp[d] = 1.
+            #if not R['difficult'][jmax]:
+            if not R['det'][jmax]:
+                tp[d] = 1.
+                R['det'][jmax] = 1
+            else:
+                fp[d] = 1.
         else:
             fp[d] = 1.
 
