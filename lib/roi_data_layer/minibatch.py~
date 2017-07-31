@@ -38,6 +38,9 @@ def get_minibatch(roidb, num_classes):
         gt_boxes = np.empty((len(gt_inds), 5), dtype=np.float32)
         gt_boxes[:, 0:4] = roidb[0]['boxes'][gt_inds, :] * im_scales[0]
         gt_boxes[:, 4] = roidb[0]['gt_classes'][gt_inds]
+	
+	import pdb
+	pdb.set_trace()
 
 	face_ids = np.empty((len(gt_inds), 1), dtype=np.float32)
 	face_ids = roidb[0]['face_ids'][gt_inds]

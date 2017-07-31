@@ -191,19 +191,28 @@ class album(imdb):
 	height = img.shape[0]
 	width = img.shape[1]
 	num_objs = 0
+	num_faces = 0
 	for label in labels:
 		xmin, ymin, xmax, ymax, class_id, face_id = _parse_label_(label)
 		if not class_id == 9:
 			num_objs += 1
+		else:
+			num_faces += 1
 	boxes = np.zeros((num_objs, 4), dtype=np.uint16)
 	gt_classes = np.zeros((num_objs), dtype=np.int32)
 	overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
 	seg_areas = np.zeros((num_objs), dtype=np.float32)
+	face_ids = np.zeros((num_objs), dtype=np.int32)
+
+	face_boxes = np.zeros((num_faces, 5), dtype=np.int32)
 	
 	ix = 0	
+	ix_face = 0
 	for label in labels:
 		xmin, ymin, xmax, ymax, class_id, face_id = _parse_label_(label)
 		if class_id == 9:
+			face_boxes[ix_face, :] = [xmin, ymin, xmax, ymax, face_id]
+			ix_face += 1
 			continue
 		xmin = 1 if xmin < 1 else xmin
 		ymin = 1 if ymin < 1 else ymin
@@ -213,6 +222,9 @@ class album(imdb):
 		gt_classes[ix] = class_id
 		overlaps[ix, class_id] = 1.0
 		seg_areas[ix] = (xmax-xmin+1)*(ymax-ymin+1)
+		
+		face_ids[ix] = face_id
+
 		ix += 1
 	overlaps = scipy.sparse.csr_matrix(overlaps)
 	
@@ -220,7 +232,9 @@ class album(imdb):
                 'gt_classes': gt_classes,
                 'gt_overlaps' : overlaps,
                 'flipped' : False,
-                'seg_areas' : seg_areas}
+                'seg_areas' : seg_areas,
+		'face_ids': face_ids,
+		'face_boxes': face_boxes}
 
 
     def _load_pascal_annotation(self, index):

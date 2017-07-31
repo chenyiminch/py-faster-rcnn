@@ -1,0 +1,106 @@
+name: "ZF"
+
+input: "data"
+input_shape {
+  dim: 1
+  dim: 256
+  dim: 1
+  dim: 1
+}
+
+input: "rois"
+input_shape {
+  dim: 1
+  dim: 5
+}
+layer {
+  name: "roi_pool_associate"
+  type: "ROIPooling"
+  bottom: "data"
+  bottom: "rois"
+  top: "roi_pool_associate"
+  roi_pooling_param {
+    pooled_w: 6
+    pooled_h: 6
+    spatial_scale: 0.0625 # 1/16
+  }
+}
+layer {
+  name: "fc6_associate"
+  type: "InnerProduct"
+  bottom: "roi_pool_associate"
+  top: "fc6_associate"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu6_associate"
+  type: "ReLU"
+  bottom: "fc6_associate"
+  top: "fc6_associate"
+}
+layer {
+  name: "drop6_associate"
+  type: "Dropout"
+  bottom: "fc6_associate"
+  top: "fc6_associate"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "fc7_associate"
+  type: "InnerProduct"
+  bottom: "fc6_associate"
+  top: "fc7_associate"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu7_associate"
+  type: "ReLU"
+  bottom: "fc7_associate"
+  top: "fc7_associate"
+}
+layer {
+  name: "drop7_associate"
+  type: "Dropout"
+  bottom: "fc7_associate"
+  top: "fc7_associate"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "associate_score"
+  type: "InnerProduct"
+  bottom: "fc7_associate"
+  top: "associate_score"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  inner_product_param {
+    num_output: 2 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "prob_associate"
+  type: "Softmax"
+  bottom: "associate_score"
+  top: "prob_associate"
+}
