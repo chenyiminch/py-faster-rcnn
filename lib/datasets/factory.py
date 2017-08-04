@@ -34,7 +34,7 @@ for year in ['2015']:
 
 for split in ['train', 'test']:
 	name = 'album_{}'.format(split)
-	__sets[name] = (lambda split=split: album(split, '/data/Data/renren_annotation/Process'))
+	__sets[name] = (lambda split=split: album(split, '/data/chenyimin/Data/det_renren_data'))
 
 def get_imdb(name):
     """Get an imdb (image database) by name."""
