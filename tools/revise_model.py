@@ -16,30 +16,26 @@ sys.path.insert(0, caffe_root + 'python')
 import caffe
 import caffe.proto.caffe_pb2 as caffe_pb2
 
-prototxt = 'model/train_val.prototxt'
-caffe_model = 'model/squeezenet_v1.1.caffemodel'
+prototxt = 'model/train.prototxt'
+caffe_model = 'model/MobileNet.v2.caffemodel'
 
 caffe.set_mode_cpu()
 
 net = caffe.Net(prototxt, caffe_model, caffe.TEST)
 
-net.params['fire6/squeeze1x1_associate'][0].data[...] = net.params['fire6/squeeze1x1'][0].data
-net.params['fire6/expand1x1_associate'][0].data[...] = net.params['fire6/expand1x1'][0].data
-net.params['fire6/expand3x3_associate'][0].data[...] = net.params['fire6/expand3x3'][0].data
+net.params['conv5_6/sep_associate'][0].data[...] = net.params['conv5_6/sep'][0].data
+net.params['conv5_6/sep/bn_associate'][0].data[...] = net.params['conv5_6/sep/bn'][0].data
+net.params['conv5_6/sep/scale_associate'][0].data[...] = net.params['conv5_6/sep/scale'][0].data
+net.params['conv6/dw/bn_associate'][0].data[...] = net.params['conv6/dw/bn'][0].data
+net.params['conv6/dw/scale_associate'][0].data[...] = net.params['conv6/dw/scale'][0].data
+net.params['conv6/sep_associate'][0].data[...] = net.params['conv6/sep'][0].data
+net.params['conv6/sep/bn_associate'][0].data[...] = net.params['conv6/sep/bn'][0].data
+net.params['conv6/sep/scale_associate'][0].data[...] = net.params['conv6/sep/scale'][0].data
 
-net.params['fire7/squeeze1x1_associate'][0].data[...] = net.params['fire7/squeeze1x1'][0].data
-net.params['fire7/expand1x1_associate'][0].data[...] = net.params['fire7/expand1x1'][0].data
-net.params['fire7/expand3x3_associate'][0].data[...] = net.params['fire7/expand3x3'][0].data
 
-net.params['fire8/squeeze1x1_associate'][0].data[...] = net.params['fire8/squeeze1x1'][0].data
-net.params['fire8/expand1x1_associate'][0].data[...] = net.params['fire8/expand1x1'][0].data
-net.params['fire8/expand3x3_associate'][0].data[...] = net.params['fire8/expand3x3'][0].data
 
-net.params['fire9/squeeze1x1_associate'][0].data[...] = net.params['fire9/squeeze1x1'][0].data
-net.params['fire9/expand1x1_associate'][0].data[...] = net.params['fire9/expand1x1'][0].data
-net.params['fire9/expand3x3_associate'][0].data[...] = net.params['fire9/expand3x3'][0].data
 
-net.save('model/SqueezeNet.v2.caffemodel')
+net.save('model/New_MobileNet.v2.caffemodel')
 
 model = caffe_pb2.NetParameter()
 f = open(caffe_model, 'rb')
