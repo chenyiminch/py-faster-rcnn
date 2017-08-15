@@ -52,6 +52,10 @@ def get_minibatch(roidb, num_classes):
             dtype=np.float32)
 	blobs['face_ids'] = face_ids
 	blobs['face_boxes'] = face_boxes
+	if roidb[0]['face_flag']:
+		blobs['face_flag'] = np.ones((1, 1), dtype=np.int16) 
+	else:
+		blobs['face_flag'] = np.zeros((1, 1), dtype=np.int16) 
     else: # not using RPN
         # Now, build the region of interest and label blobs
         rois_blob = np.zeros((0, 5), dtype=np.float32)

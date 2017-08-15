@@ -31,6 +31,8 @@ class FaceProposalLinkLayer(caffe.Layer):
 		face_ids = bottom[2].data
 		# Face boxes
 		face_boxes = bottom[3].data
+		# Face flag
+		face_flag = bottom[4].data
 		
 		zeros = np.zeros((gt_boxes.shape[0], 1), dtype=gt_boxes.dtype)
 		all_rois = np.vstack((all_rois, np.hstack((zeros, gt_boxes[:, :-1])))) 
@@ -38,11 +40,15 @@ class FaceProposalLinkLayer(caffe.Layer):
 		assert np.all(all_rois[:, 0] == 0), 'Only single iterm batches are supported'
 		
 		num_images = 1
+		
 		rois_per_image = cfg.TRAIN.ASSOCIATE_BATCH_SIZE/num_images
 		fg_rois_per_image = int(np.round(cfg.TRAIN.FG_FRACTION * rois_per_image))
-
-		rois, labels = _sample_rois_(all_rois, gt_boxes, face_ids, face_boxes, fg_rois_per_image, rois_per_image)
 		
+		if face_flag[0, 0] == 1:	
+			rois, labels = _sample_rois_(all_rois, gt_boxes, face_ids, face_boxes, fg_rois_per_image, rois_per_image)
+		else:
+			rois = all_rois
+			labels = -1 * np.ones((all_rois.shape[0], 1), dtype=np.int16)
 		top[0].reshape(*rois.shape)
 		top[0].data[...] = rois
 

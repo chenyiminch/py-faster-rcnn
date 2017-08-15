@@ -116,13 +116,17 @@ class imdb(object):
 	    face_boxes[:, 0] = widths[i] - oldx2 - 1
 	    face_boxes[:, 2] = widths[i] - oldx1 - 1
 	    assert (face_boxes[:, 2] >= face_boxes[:, 0]).all()
-
+	    if face_boxes.shape[0] == 0:
+		face_exist = 0
+	    else:
+		face_exist = 1
             entry = {'boxes' : boxes,
                      'gt_overlaps' : self.roidb[i]['gt_overlaps'],
                      'gt_classes' : self.roidb[i]['gt_classes'],
 		     'face_boxes' : face_boxes,
 		     'face_ids' : self.roidb[i]['face_ids'],
-                     'flipped' : True}
+                     'flipped' : True,
+		     'face_flag': face_exist}
             self.roidb.append(entry)
         self._image_index = self._image_index * 2
 

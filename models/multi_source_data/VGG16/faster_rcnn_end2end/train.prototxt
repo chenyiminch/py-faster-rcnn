@@ -5,13 +5,10 @@ layer {
   top: 'data'
   top: 'im_info'
   top: 'gt_boxes'
-  top: 'face_ids'
-  top: 'face_boxes'
-  top: 'face_flag'
   python_param {
     module: 'roi_data_layer.layer'
     layer: 'RoIDataLayer'
-    param_str: "'num_classes': 5"
+    param_str: "'num_classes': 21"
   }
 }
 
@@ -530,130 +527,7 @@ layer {
   python_param {
     module: 'rpn.proposal_target_layer'
     layer: 'ProposalTargetLayer'
-    param_str: "'num_classes': 5"
-  }
-}
-
-#======== Associate branch =======
-layer {
-  name: 'face_roi_data'
-  type: 'Python'
-  bottom: 'rpn_rois'
-  bottom: 'gt_boxes'
-  bottom: 'face_ids'
-  bottom: 'face_boxes'
-  bottom: 'face_flag'
-  top: 'associate_rois'
-  top: 'associate_labels'
-  python_param {
-    module: 'rpn.face_proposal_link_layer'
-    layer: 'FaceProposalLinkLayer'
-    param_str: "'num_classes': 5"
-  }
-}
-layer {
-  name: "roi_pool_associate"
-  type: "ROIPooling"
-  bottom: "conv5_3"
-  bottom: "associate_rois"
-  top: "roi_pool_associate"
-  roi_pooling_param {
-    pooled_w: 7
-    pooled_h: 7
-    spatial_scale: 0.0625 # 1/16
-  }
-}
-layer {
-  name: "fc6_associate"
-  type: "InnerProduct"
-  bottom: "roi_pool_associate"
-  top: "fc6_associate"
-  param {
-    lr_mult: 1
-  }
-  param {
-    lr_mult: 2
-  }
-  inner_product_param {
-    num_output: 4096
-  }
-}
-layer {
-  name: "relu6_associate"
-  type: "ReLU"
-  bottom: "fc6_associate"
-  top: "fc6_associate"
-}
-layer {
-  name: "drop6_associate"
-  type: "Dropout"
-  bottom: "fc6_associate"
-  top: "fc6_associate"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  name: "fc7_associate"
-  type: "InnerProduct"
-  bottom: "fc6_associate"
-  top: "fc7_associate"
-  param {
-    lr_mult: 1
-  }
-  param {
-    lr_mult: 2
-  }
-  inner_product_param {
-    num_output: 4096
-  }
-}
-layer {
-  name: "relu7_associate"
-  type: "ReLU"
-  bottom: "fc7_associate"
-  top: "fc7_associate"
-}
-layer {
-  name: "drop7_associate"
-  type: "Dropout"
-  bottom: "fc7_associate"
-  top: "fc7_associate"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  name: "associate_score"
-  type: "InnerProduct"
-  bottom: "fc7_associate"
-  top: "associate_score"
-  param { lr_mult: 1.0 }
-  param { lr_mult: 2.0 }
-  inner_product_param {
-    num_output: 2 
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "loss_associate"
-  type: "SoftmaxWithLoss"
-  bottom: "associate_score"
-  bottom: "associate_labels"
-  propagate_down: 1
-  propagate_down: 0
-  top: "loss_associate"
-  loss_weight: 1
-  loss_param {
-    ignore_label: -1
-    normalize: true
+    param_str: "'num_classes': 21"
   }
 }
 
@@ -743,7 +617,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: 5
+    num_output: 21
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -766,7 +640,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: 20
+    num_output: 84
     weight_filler {
       type: "gaussian"
       std: 0.001
