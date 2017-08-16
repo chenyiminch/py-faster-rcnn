@@ -104,10 +104,14 @@ class imdb(object):
         widths = self._get_widths()
         for i in xrange(num_images):
             boxes = self.roidb[i]['boxes'].copy()
+	    print 'width: {}'.format(widths[i])
+	    print self.roidb[i]['filename']
+	    print boxes
             oldx1 = boxes[:, 0].copy()
             oldx2 = boxes[:, 2].copy()
-            boxes[:, 0] = widths[i] - oldx2 - 1
-            boxes[:, 2] = widths[i] - oldx1 - 1
+            boxes[:, 0] = widths[i] - oldx2# - 1
+            boxes[:, 2] = widths[i] - oldx1# - 1
+	    print boxes
             assert (boxes[:, 2] >= boxes[:, 0]).all()
 
 	    face_boxes = self.roidb[i]['face_boxes'].copy()

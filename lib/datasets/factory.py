@@ -39,7 +39,7 @@ for split in ['train', 'test']:
 
 for split in ['train', 'test']:
 	name = 'multi_source_data_{}'.format(split)
-	__sets[name] = (lambda split=split: multi_source_data(split, '/data/chenyimin/Data/det_renren_data'))
+	__sets[name] = (lambda split=split: multi_source_data(split, '/mnt/lustre/chenyimin/Data/Images/faster_rcnn_data'))
 
 
 def get_imdb(name):

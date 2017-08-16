@@ -39,7 +39,7 @@ class multi_source_data(imdb):
         self._image_set = image_set
         self._data_path = data_path 
         self._classes = ('__background__', # always index 0
-                         'upper', 'dress', 'pants', 'skirt')
+                         'upper', 'down')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -239,7 +239,8 @@ class multi_source_data(imdb):
                 'seg_areas' : seg_areas,
 		'face_ids': face_ids,
 		'face_boxes': face_boxes,
-		'face_flag': face_exist}
+		'face_flag': face_exist, 
+		'filename': filename}
 
 
     def _load_pascal_annotation(self, index):

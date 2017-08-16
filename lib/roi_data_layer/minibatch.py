@@ -38,24 +38,26 @@ def get_minibatch(roidb, num_classes):
         gt_boxes = np.empty((len(gt_inds), 5), dtype=np.float32)
         gt_boxes[:, 0:4] = roidb[0]['boxes'][gt_inds, :] * im_scales[0]
         gt_boxes[:, 4] = roidb[0]['gt_classes'][gt_inds]
-
-	face_ids = np.empty((len(gt_inds), 1), dtype=np.float32)
-	face_ids = roidb[0]['face_ids'][gt_inds]
 	
-	face_boxes = np.empty((roidb[0]['face_boxes'].shape[0], 5), dtype=np.float32)
-	face_boxes[:, 0:4] = roidb[0]['face_boxes'][:, 0:4] * im_scales[0]
-	face_boxes[:, 4] = roidb[0]['face_boxes'][:, 4]
-
-        blobs['gt_boxes'] = gt_boxes
+	blobs['gt_boxes'] = gt_boxes
         blobs['im_info'] = np.array(
             [[im_blob.shape[2], im_blob.shape[3], im_scales[0]]],
             dtype=np.float32)
-	blobs['face_ids'] = face_ids
-	blobs['face_boxes'] = face_boxes
-	if roidb[0]['face_flag']:
-		blobs['face_flag'] = np.ones((1, 1), dtype=np.int16) 
-	else:
-		blobs['face_flag'] = np.zeros((1, 1), dtype=np.int16) 
+	
+	if cfg.TRAIN.FACE_ASSOCIATE: 
+		face_ids = np.empty((len(gt_inds), 1), dtype=np.float32)
+		face_ids = roidb[0]['face_ids'][gt_inds]
+		
+        	blobs['face_ids'] = face_ids
+		if roidb[0]['face_flag']:
+			blobs['face_flag'] = np.ones((1, 1), dtype=np.int16)
+			face_boxes = np.empty((roidb[0]['face_boxes'].shape[0], 5), dtype=np.float32)
+			face_boxes[:, 0:4] = roidb[0]['face_boxes'][:, 0:4] * im_scales[0]
+			face_boxes[:, 4] = roidb[0]['face_boxes'][:, 4]
+		else:
+			blobs['face_flag'] = np.zeros((1, 1), dtype=np.int16)
+			face_boxes = np.zeros((1, 5), dtype=np.float32)
+		blobs['face_boxes'] = face_boxes
     else: # not using RPN
         # Now, build the region of interest and label blobs
         rois_blob = np.zeros((0, 5), dtype=np.float32)
