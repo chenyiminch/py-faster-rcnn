@@ -44,7 +44,7 @@ def get_minibatch(roidb, num_classes):
             [[im_blob.shape[2], im_blob.shape[3], im_scales[0]]],
             dtype=np.float32)
 	
-	if cfg.TRAIN.FACE_ASSOCIATE: 
+	if cfg.TRAIN['FACE_ASSOCIATE']: 
 		face_ids = np.empty((len(gt_inds), 1), dtype=np.float32)
 		face_ids = roidb[0]['face_ids'][gt_inds]
 		

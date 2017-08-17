@@ -106,7 +106,7 @@ class RoIDataLayer(caffe.Layer):
             self._name_to_top_map['gt_boxes'] = idx
             idx += 1
 
-	    if cfg.TRAIN.FACE_ASSOCIATE:
+	    if cfg.TRAIN['FACE_ASSOCIATE']:
 	    	top[idx].reshape(1, 1)
 	    	self._name_to_top_map['face_ids'] = idx
 	    	idx += 1

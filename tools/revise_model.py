@@ -17,25 +17,16 @@ import caffe
 import caffe.proto.caffe_pb2 as caffe_pb2
 
 prototxt = 'model/train.prototxt'
-caffe_model = 'model/MobileNet.v2.caffemodel'
+caffe_model = 'model/VGG16.v2.caffemodel_old'
 
 caffe.set_mode_cpu()
 
 net = caffe.Net(prototxt, caffe_model, caffe.TEST)
 
-net.params['conv5_6/sep_associate'][0].data[...] = net.params['conv5_6/sep'][0].data
-net.params['conv5_6/sep/bn_associate'][0].data[...] = net.params['conv5_6/sep/bn'][0].data
-net.params['conv5_6/sep/scale_associate'][0].data[...] = net.params['conv5_6/sep/scale'][0].data
-net.params['conv6/dw/bn_associate'][0].data[...] = net.params['conv6/dw/bn'][0].data
-net.params['conv6/dw/scale_associate'][0].data[...] = net.params['conv6/dw/scale'][0].data
-net.params['conv6/sep_associate'][0].data[...] = net.params['conv6/sep'][0].data
-net.params['conv6/sep/bn_associate'][0].data[...] = net.params['conv6/sep/bn'][0].data
-net.params['conv6/sep/scale_associate'][0].data[...] = net.params['conv6/sep/scale'][0].data
+net.params['fc6_associate'][0].data[...] = net.params['fc6'][0].data
+net.params['fc7_associate'][0].data[...] = net.params['fc7'][0].data
 
-
-
-
-net.save('model/New_MobileNet.v2.caffemodel')
+net.save('model/New_VGG16.v2.caffemodel')
 
 model = caffe_pb2.NetParameter()
 f = open(caffe_model, 'rb')
